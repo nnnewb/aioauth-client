@@ -145,9 +145,7 @@ class Client(object, metaclass=ClientRegistry):
         try:
             async with session.request(method, url, **kwargs) as response:
 
-                if response.status / 100 > 2:
-                    raise web.HTTPBadRequest(
-                        reason='HTTP status code: %s' % response.status)
+                response.raise_for_status()
 
                 if 'json' in response.headers.get('CONTENT-TYPE'):
                     data = await response.json()
