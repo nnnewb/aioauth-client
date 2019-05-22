@@ -138,7 +138,7 @@ class Client(object, metaclass=ClientRegistry):
         """String representation."""
         return "<%s>" % self
 
-    async def _request(self, method, url, loop=None, timeout=None, **kwargs):
+    async def _request(self, method, url, loop=None, timeout=None, raw_content=False, **kwargs):
         """Make a request through AIOHTTP."""
         session = self.session or aiohttp.ClientSession(
             loop=loop, conn_timeout=timeout, read_timeout=timeout)
@@ -149,6 +149,8 @@ class Client(object, metaclass=ClientRegistry):
 
                 if 'json' in response.headers.get('CONTENT-TYPE'):
                     data = await response.json()
+                elif raw_content:
+                    data = await response.content.read()
                 else:
                     data = await response.text()
                     data = dict(parse_qsl(data))
